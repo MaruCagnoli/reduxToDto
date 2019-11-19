@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset="utf-8">
+      <title>ToDo App</title>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.4/redux.js"></script>
+  </head>
+  <body>
+      <h2>ToDo App</h2>
+      <br/>
+      <label>Ingresar tarea: </label>
+      <input id="texto"onkeypress="agregarTarea(event)">
+      <!-- falta evento-->
+
+      <ul id="listaDesordenada">
+        <script type="text/javascript">
+        //JUEGO DE REDUX
+        //I. Crear el STATE inicial
+        var state = {
+          lista: []
+        }
+
+        //II.Crear el STORE
+        var store = Redux.createStore(reducer, state);
+
+        //III. Crear el REDUCER
+        function reducer(state, action){
+          var nuevoState = Object.assign({},state);
+          if(action.type === 'AGR'){
+            nuevoState.lista = state.lista.concat(
+              [{
+              id: action.id,
+              li: "<li>"+ action.tarea + "<button id= '" + action.id + "'onclick='eliminarTarea(id)'>Eliminar</button>" + "</li>"
+            }]);
+          }else if(action.type ==='ELM'){
+            nuevoState.lista = state.lista.filter((elemento)=>(
+               parseInt(elemento.id) != parseInt(action.id)
+            ));
+          }           
+          return nuevoState;
+        }
+        //IV. Crear el ACTION
+        //var actionA = {
+          //  type: 'AGR'
+        //}
+        //IV.2 ACTION CREATOR
+        const actionAgregar = (tarea, id) =>{
+          return{
+            type:'AGR',
+            tarea,
+            id
+          }
+        }
+        const actionEliminar = (id) => {
+          return{
+            type:'ELM',
+            id
+          }
+        }
+        
+        var id = 1;
+
+        const agregarTarea = (evento)=>{
+            if(evento.keyCode === 13){
+              var tarea  = evento.target.value;
+              store.dispatch(actionAgregar(tarea, id));
+              evento.target.value = "";
+              id = id + 1; 
+            }
+        }
+        const eliminarTarea = (_id) =>{
+          store.dispatch(actionEliminar(_id));
+        }
+        const mostrarTareas = () =>{
+          var listaD = document.getElementById('listaDesordenada');
+          var elementos = store.getState().lista;
+          var mostrarElementos = elementos.map(function(elemento){
+            return elemento.li;
+          });
+          listaD.innerHTML = mostrarElementos;
+        }
+        store.subscribe(mostrarTareas);
+              
+        
+        </script>
+
+      </ul>
+  </body>
+</html>
